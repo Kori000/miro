@@ -1,3 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="50.26" height="32" viewBox="0 0 256 163">
-  <path fill="#3C7DD0" d="m0 137.507l26.771-21.6V46.85L0 30.118zM43.503 8.821v144.352l29.966-25.25V34.681zM90.05 0v162.757l29.965-30.726V30.27zm139.18 46.85v69.057l26.771 21.6V30.116zM212.497 8.822v144.352l-29.966-25.25V34.681zM165.95 0l-29.966 30.27v101.761l29.966 30.726z"/>
+<svg id="logo-38" width="78" height="32" viewBox="0 0 78 32" fill="none"
+  xmlns="http://www.w3.org/2000/svg">
+  <path d="M55.5 0H77.5L58.5 32H36.5L55.5 0Z" class="ccustom" fill="#FF7A00"></path>
+  <path d="M35.5 0H51.5L32.5 32H16.5L35.5 0Z" class="ccompli1" fill="#FF9736"></path>
+  <path d="M19.5 0H31.5L12.5 32H0.5L19.5 0Z" class="ccompli2" fill="#FFBC7D"></path>
 </svg>
