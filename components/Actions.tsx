@@ -9,8 +9,12 @@ import {
 import { api } from '@/convex/_generated/api'
 import { useApiMutation } from '@/hooks/use-api-mutation'
 import { DropdownMenuContentProps } from '@radix-ui/react-dropdown-menu'
-import { Link2, Trash2 } from 'lucide-react'
+import { Link2, Pencil, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
+import { ConfirmModal } from '@/components/confirm-model'
+import { Button } from './ui/button'
+import { useRenameModal } from '@/store/use-rename-modal'
+import { useState } from 'react'
 
 interface ActionsProps {
   children: React.ReactNode
@@ -27,6 +31,10 @@ export const Actions = ({
   title,
   children,
 }: ActionsProps) => {
+  const { onOpen } = useRenameModal()
+
+  const [isOpen, setIsOpen] = useState(false)
+
   const onCopyLink = () => {
     navigator.clipboard
       .writeText(`${window.location.origin}/board/${id}}`)
@@ -41,12 +49,16 @@ export const Actions = ({
       .then(() => toast.success('Board deleted'))
       .catch(() => toast.error('Failed to delete board'))
   }
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
 
       <DropdownMenuContent
-        onClick={e => e.stopPropagation()}
+        onClick={e => {
+          e.stopPropagation()
+          e.preventDefault()
+        }}
         side={side}
         sideOffset={sideOffset}
         className="w-60 "
@@ -56,10 +68,30 @@ export const Actions = ({
           Copy board link
         </DropdownMenuItem>
 
-        <DropdownMenuItem onClick={onDelete} className="p-3 cursor-pointer ">
-          <Trash2 className="size-4 mr-2 " />
-          Delete
+        <DropdownMenuItem
+          onClick={() => {
+            onOpen(id, title)
+          }}
+          className="p-3 cursor-pointer "
+        >
+          <Pencil className="size-4 mr-2 " />
+          Rename
         </DropdownMenuItem>
+
+        <ConfirmModal
+          header="Delete board?"
+          description="This will delete the board and all of its contents."
+          disabled={pending}
+          onConfirm={onDelete}
+        >
+          <Button
+            variant="ghost"
+            className="p-3 cursor-pointer text-sm w-full justify-start font-normal "
+          >
+            <Trash2 className="size-4 mr-2 " />
+            Delete
+          </Button>
+        </ConfirmModal>
       </DropdownMenuContent>
     </DropdownMenu>
   )

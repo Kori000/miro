@@ -1,10 +1,9 @@
 import { v } from 'convex/values'
 
 import { defineSchema, defineTable } from 'convex/server'
-import { title } from 'process'
 
 export default defineSchema({
-  board: defineTable({
+  boards: defineTable({
     title: v.string(),
     orgId: v.string(),
     authorId: v.string(),

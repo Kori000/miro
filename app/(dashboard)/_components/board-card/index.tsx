@@ -8,8 +8,9 @@ import { useAuth } from '@clerk/nextjs'
 import { formatDistanceToNow } from 'date-fns'
 import Footer from './footer'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Actions } from '@/components/Actions'
+import { Actions } from '@/components/actions'
 import { MoreHorizontal } from 'lucide-react'
+import { useRenameModal } from '@/store/use-rename-modal'
 
 type BoardCardProps = {
   id: string
