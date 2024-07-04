@@ -19,6 +19,7 @@ const BoardList = ({ orgId, query }: BoardListProps) => {
   // TODO:
   const data = useQuery(api.boards.get, {
     orgId,
+    ...query,
   })
 
   if (data === undefined) {
@@ -64,7 +65,7 @@ const BoardList = ({ orgId, query }: BoardListProps) => {
             authorName={board.authorName}
             createdAt={board._creationTime}
             orgId={board.orgId}
-            isFavorite={false}
+            isFavorite={board.isFavorite}
           />
         ))}
       </div>
