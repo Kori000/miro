@@ -1,13 +1,12 @@
 import { query } from './_generated/server'
 
-import { v } from 'convex/values'
 import { getAllOrThrow } from 'convex-helpers/server/relationships'
-import { Id } from './_generated/dataModel'
+import { v } from 'convex/values'
 export const get = query({
   args: {
     orgId: v.string(),
     search: v.optional(v.string()),
-    favorite: v.optional(v.string()),
+    favorites: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity()
@@ -17,14 +16,16 @@ export const get = query({
     }
 
     const userId = identity.subject
-    if (args.favorite) {
+    if (args.favorites) {
       const favoriteBoards = await ctx.db
         .query('userFavorites')
-        .withIndex('by_user_board', q =>
-          q.eq('userId', userId).eq('boardId', args.orgId as Id<'boards'>),
+        .withIndex('by_user_org', q =>
+          q.eq('userId', userId).eq('orgId', args.orgId),
         )
         .order('desc')
         .collect()
+
+      console.log('favoriteBoards', favoriteBoards)
 
       const ids = favoriteBoards.map(b => b.boardId)
 

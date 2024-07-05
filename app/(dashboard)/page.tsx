@@ -8,7 +8,7 @@ import BoardList from './_components/board-list'
 type DashboardPageProps = {
   searchParams: {
     search?: string
-    favorites?: boolean
+    favorites?: string
   }
 }
 
