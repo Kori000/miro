@@ -15,6 +15,7 @@ import { ConfirmModal } from '@/components/confirm-model'
 import { Button } from './ui/button'
 import { useRenameModal } from '@/store/use-rename-modal'
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 
 interface ActionsProps {
   children: React.ReactNode
@@ -33,7 +34,7 @@ export const Actions = ({
 }: ActionsProps) => {
   const { onOpen } = useRenameModal()
 
-  const [isOpen, setIsOpen] = useState(false)
+  const router = useRouter()
 
   const onCopyLink = () => {
     navigator.clipboard
@@ -46,7 +47,10 @@ export const Actions = ({
 
   const onDelete = () => {
     mutate({ id })
-      .then(() => toast.success('Board deleted'))
+      .then(() => {
+        router.push('/')
+        toast.success('Board deleted')
+      })
       .catch(() => toast.error('Failed to delete board'))
   }
 

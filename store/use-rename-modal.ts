@@ -28,8 +28,6 @@ export const useRenameModal = create<IRenameModal>(set => ({
 
     setTimeout(() => {
       document.body.style.pointerEvents = ''
-
-      console.log(1232)
     }, 400)
   },
   initialValues: defaultValues,
