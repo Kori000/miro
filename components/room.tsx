@@ -1,5 +1,7 @@
 'use client'
 
+import { Layer } from '@/types/canvas'
+import { LiveList, LiveMap, LiveObject } from '@liveblocks/client'
 import { ClientSideSuspense, RoomProvider } from '@liveblocks/react'
 
 type RoomProps = {
@@ -12,6 +14,11 @@ export const Room = ({ children, roomId, fallback }: RoomProps) => {
     <RoomProvider
       initialPresence={{
         cursor: null,
+        selection: [],
+      }}
+      initialStorage={{
+        layers: new LiveMap<string, LiveObject<Layer>>(),
+        layerIds: new LiveList([]),
       }}
       id={roomId}
     >
