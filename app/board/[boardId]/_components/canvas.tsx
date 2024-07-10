@@ -34,6 +34,7 @@ import { Participants } from './participants'
 import { Toolbar } from './toolbar'
 import { LayerPreview } from './layer-preview'
 import { SelectionBox } from './selection-box'
+import { SelectionTools } from './selection-tools'
 
 const MAX_LAYERS = 100
 
@@ -307,9 +308,7 @@ export const Canvas = ({ boardId }: CanvasProps) => {
   return (
     <main className="h-full w-full relative bg-neutral-100 touch-none ">
       <Info boardId={boardId} />
-
       <Participants />
-
       <Toolbar
         canvasState={canvasState}
         setCanvasState={setCanvasState}
@@ -319,6 +318,7 @@ export const Canvas = ({ boardId }: CanvasProps) => {
         redo={history.redo}
       />
 
+      <SelectionTools camera={camera} setLastUsedColor={setLastUsedColor} />
       <svg
         onWheel={onWheel}
         onPointerMove={onPointerMove}
