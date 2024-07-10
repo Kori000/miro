@@ -57,3 +57,41 @@ export function resizeBounds(bounds: XYWH, corner: Side, point: Point): XYWH {
 
   return result
 }
+
+export function findIntersectingLayersWithRectangle(
+  layerIds: readonly string[],
+  layers: ReadonlyMap<string, any>,
+  a: Point,
+  b: Point,
+) {
+  const rect: XYWH = {
+    x: Math.min(a.x, b.x),
+    y: Math.min(a.y, b.y),
+    width: Math.abs(a.x - b.x),
+    height: Math.abs(a.y - b.y),
+  }
+
+  const ids = []
+
+  for (const layerId of layerIds) {
+    const layer = layers.get(layerId)
+
+    if (layer == null) {
+      continue
+    }
+
+    // 所有图层的信息
+    const { x, y, width, height } = layer
+
+    if (
+      rect.x + rect.width > x &&
+      rect.x < x + width &&
+      rect.y + rect.height > y &&
+      rect.y < y + height
+    ) {
+      ids.push(layerId)
+    }
+  }
+
+  return ids
+}

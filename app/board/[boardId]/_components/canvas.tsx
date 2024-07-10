@@ -2,6 +2,7 @@
 
 import {
   connectionIdToColor,
+  findIntersectingLayersWithRectangle,
   pointerEventToCanvasPoint,
   resizeBounds,
 } from '@/lib/utils'
@@ -27,7 +28,7 @@ import {
   useStorage,
 } from '@liveblocks/react'
 import { nanoid } from 'nanoid'
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { CursorsPresence } from './cursors-presence'
 import { Info } from './info'
 import { Participants } from './participants'
@@ -35,8 +36,11 @@ import { Toolbar } from './toolbar'
 import { LayerPreview } from './layer-preview'
 import { SelectionBox } from './selection-box'
 import { SelectionTools } from './selection-tools'
+import { min } from 'date-fns'
 
 const MAX_LAYERS = 100
+
+const SELECTION_NET_THRESHOLD = 5
 
 type CanvasProps = {
   boardId: string
@@ -119,6 +123,45 @@ export const Canvas = ({ boardId }: CanvasProps) => {
     [],
   )
 
+  const updateSelectionNet = useMutation(
+    ({ setMyPresence, storage }, current: Point, origin: Point) => {
+      const layers = storage.get('layers').toImmutable()
+
+      setCanvasState({
+        mode: CanvasMode.SelectionNet,
+        origin,
+        current,
+      })
+
+      if (!layerIds) return
+      const ids = findIntersectingLayersWithRectangle(
+        layerIds,
+        layers,
+        origin,
+        current,
+      )
+
+      setMyPresence({
+        selection: ids,
+      })
+    },
+    [layerIds],
+  )
+
+  const startMuletiSelection = useCallback((current: Point, origin: Point) => {
+    // 安全距离阈值
+    if (
+      Math.abs(current.x - origin.x) + Math.abs(current.y - origin.y) >
+      SELECTION_NET_THRESHOLD
+    ) {
+      setCanvasState({
+        mode: CanvasMode.SelectionNet,
+        origin,
+        current,
+      })
+    }
+  }, [])
+
   const resizeSelectedLayer = useMutation(
     ({ storage, self }, point: Point) => {
       if (canvasState.mode !== CanvasMode.Resizing) {
@@ -181,9 +224,9 @@ export const Canvas = ({ boardId }: CanvasProps) => {
 
       const liveLayers = storage.get('layers')
 
+      // 每一个选中的图层都要更新位置
       for (const id of self.presence.selection) {
         const layer = liveLayers.get(id)
-
         if (layer) {
           layer.update({
             x: layer.get('x') + offset.x,
@@ -226,7 +269,12 @@ export const Canvas = ({ boardId }: CanvasProps) => {
       e.preventDefault()
 
       const current = pointerEventToCanvasPoint(e, camera)
-      if (canvasState.mode === CanvasMode.Translating) {
+
+      if (canvasState.mode === CanvasMode.Pressing) {
+        startMuletiSelection(current, canvasState.origin)
+      } else if (canvasState.mode === CanvasMode.SelectionNet) {
+        updateSelectionNet(current, canvasState.origin)
+      } else if (canvasState.mode === CanvasMode.Translating) {
         translateSelectedLayer(current)
       } else if (canvasState.mode === CanvasMode.Resizing) {
         resizeSelectedLayer(current)
@@ -305,6 +353,16 @@ export const Canvas = ({ boardId }: CanvasProps) => {
 
     return layerIdsToColorSelection
   }, [selections])
+
+  useEffect(() => {
+    if (canvasState.mode !== CanvasMode.SelectionNet || !canvasState.current)
+      return
+    console.log('x 轴在', Math.min(canvasState.origin.x, canvasState.current.x))
+    console.log('y 轴在', Math.min(canvasState.origin.y, canvasState.current.y))
+    console.log('宽度', Math.abs(canvasState.origin.x - canvasState.current.x))
+    console.log('高度', Math.abs(canvasState.origin.y - canvasState.current.y))
+  }, [canvasState])
+
   return (
     <main className="h-full w-full relative bg-neutral-100 touch-none ">
       <Info boardId={boardId} />
@@ -342,7 +400,16 @@ export const Canvas = ({ boardId }: CanvasProps) => {
           ))}
 
           <SelectionBox onResizeHandlePointerDown={onResizeHandlePointerDown} />
-
+          {canvasState.mode === CanvasMode.SelectionNet &&
+            canvasState.current !== undefined && (
+              <rect
+                className="fill-blue-500/5 stroke-blue-500 stroke-1 "
+                x={Math.min(canvasState.origin.x, canvasState.current.x)}
+                y={Math.min(canvasState.origin.y, canvasState.current.y)}
+                width={Math.abs(canvasState.origin.x - canvasState.current.x)}
+                height={Math.abs(canvasState.origin.y - canvasState.current.y)}
+              />
+            )}
           <CursorsPresence />
         </g>
       </svg>
