@@ -2,21 +2,69 @@
 
 import { useSelectionBounds } from '@/hooks/use-selection-bounds'
 import { Camera, Color } from '@/types/canvas'
-import { useMutation, useSelf } from '@liveblocks/react'
+import { useMutation, useSelf, useStorage } from '@liveblocks/react'
 import { memo } from 'react'
 import { ColorPicker } from './color-picker'
 import Hint from '@/components/hint'
 import { Button } from '@/components/ui/button'
 import { useDeleteLayers } from '@/hooks/use-delete-layers'
-import { Trash2 } from 'lucide-react'
+import { BringToFront, SendToBack, Trash2 } from 'lucide-react'
 
 type SelectionToolsProps = {
   camera: Camera
   setLastUsedColor: (color: Color) => void
 }
+
 export const SelectionTools = memo(
   ({ camera, setLastUsedColor }: SelectionToolsProps) => {
     const selection = useSelf(me => me.presence.selection)
+
+    const moveToBack = useMutation(
+      ({ storage }) => {
+        const liveLayerIds = storage.get('layerIds')
+        const indices: number[] = []
+
+        const arr = liveLayerIds.toArray()
+
+        for (let i = 0; i < arr.length; i++) {
+          if (selection?.includes(arr[i])) {
+            indices.push(i)
+          }
+
+          for (let i = 0; i < indices.length; i++) {
+            liveLayerIds.move(indices[i], i)
+          }
+        }
+      },
+      [selection],
+    )
+    const layer = useStorage(root => root.layers)
+
+    const moveToFront = useMutation(
+      ({ storage }) => {
+        const liveLayerIds = storage.get('layerIds')
+        const liveLayer = storage.get('layers')
+        const indices: number[] = []
+
+        const arr = liveLayerIds.toArray()
+
+        for (let i = 0; i < arr.length; i++) {
+          if (selection?.includes(arr[i])) {
+            indices.push(i)
+          }
+        }
+
+        for (let i = indices.length - 1; i >= 0; i--) {
+          liveLayerIds.move(
+            indices[i],
+            arr.length - 1 - (indices.length - 1 - i),
+          )
+        }
+
+        console.log('indices', indices)
+      },
+      [selection],
+    )
 
     const setFill = useMutation(
       ({ storage }, fill: Color) => {
@@ -49,6 +97,20 @@ export const SelectionTools = memo(
         }}
       >
         <ColorPicker onChange={setFill} />
+
+        <div className="flex flex-col gap-y-0.5 ">
+          <Hint label="Bring to front">
+            <Button onClick={moveToFront} variant="board" size="icon">
+              <BringToFront />
+            </Button>
+          </Hint>
+
+          <Hint label="Send to back" side="bottom">
+            <Button onClick={moveToBack} variant="board" size="icon">
+              <SendToBack />
+            </Button>
+          </Hint>
+        </div>
 
         <div className="flex items-center pl-2 ml-2 border-l border-neutral-200 ">
           <Hint label="Delete">
