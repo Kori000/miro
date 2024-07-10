@@ -13,10 +13,12 @@ const HANDLE_WIDTH = 10
 
 export const SelectionBox = memo(
   ({ onResizeHandlePointerDown }: SelectionBoxProps) => {
+    // 自己选择的且只选择了一个图层
     const soleLayerId = useSelf(me =>
       me.presence.selection.length === 1 ? me.presence.selection[0] : null,
     )
 
+    // 只有一个图层并且不是路径
     const isShowingHandles = useStorage(
       root =>
         soleLayerId && root.layers.get(soleLayerId)?.type !== LayerType.Path,

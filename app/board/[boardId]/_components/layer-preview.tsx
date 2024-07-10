@@ -4,6 +4,7 @@ import { LayerType } from '@/types/canvas'
 import { useStorage } from '@liveblocks/react'
 import React, { memo } from 'react'
 import { Rectangle } from './rectangle'
+import { Ellipse } from './ellipse'
 
 type LayerPreviewProps = {
   id: string
@@ -17,6 +18,16 @@ export const LayerPreview = memo(
     if (!layer) return null
 
     switch (layer.type) {
+      case LayerType.Ellipse:
+        return (
+          <Ellipse
+            id={id}
+            layer={layer}
+            onPointerDown={onLayerPointerDown}
+            selectionColor={selectionColor}
+          />
+        )
+
       case LayerType.Rectangle:
         return (
           <Rectangle
@@ -28,7 +39,7 @@ export const LayerPreview = memo(
         )
 
       default:
-        return <div></div>
+        return <div />
     }
   },
 )

@@ -354,14 +354,14 @@ export const Canvas = ({ boardId }: CanvasProps) => {
     return layerIdsToColorSelection
   }, [selections])
 
-  useEffect(() => {
-    if (canvasState.mode !== CanvasMode.SelectionNet || !canvasState.current)
-      return
-    console.log('x 轴在', Math.min(canvasState.origin.x, canvasState.current.x))
-    console.log('y 轴在', Math.min(canvasState.origin.y, canvasState.current.y))
-    console.log('宽度', Math.abs(canvasState.origin.x - canvasState.current.x))
-    console.log('高度', Math.abs(canvasState.origin.y - canvasState.current.y))
-  }, [canvasState])
+  // useEffect(() => {
+  //   if (canvasState.mode !== CanvasMode.SelectionNet || !canvasState.current)
+  //     return
+  //   console.log('x 轴在', Math.min(canvasState.origin.x, canvasState.current.x))
+  //   console.log('y 轴在', Math.min(canvasState.origin.y, canvasState.current.y))
+  //   console.log('宽度', Math.abs(canvasState.origin.x - canvasState.current.x))
+  //   console.log('高度', Math.abs(canvasState.origin.y - canvasState.current.y))
+  // }, [canvasState])
 
   return (
     <main className="h-full w-full relative bg-neutral-100 touch-none ">
